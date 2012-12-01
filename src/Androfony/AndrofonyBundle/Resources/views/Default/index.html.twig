@@ -1,0 +1,52 @@
+{% extends "AndrofonyBundle:Default:layout.html.twig"%}
+{% block cuerpo %}
+	<div id="mapa"></div>
+{% endblock %}
+{% block javascript %}
+	<script type="text/javascript">
+	var map;
+	var directionsDisplay = null;
+	var directionsService = null;
+	
+
+      function initialize() {
+        var mapOptions = {
+          zoom: 13,
+          center: new google.maps.LatLng(-16.5072, -68.12871),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById('mapa'),
+            mapOptions);
+        directionsDisplay = new google.maps.DirectionsRenderer();
+		directionsService = new google.maps.DirectionsService();
+      }
+      function getDirections(){
+		var start = $('#start').val();
+		var end = $('#end').val();
+		if(!start || !end){
+			alert("Start and End addresses are required");
+			return;
+		}
+		var request = {
+		        origin: start,
+		        destination: end,
+		        travelMode: google.maps.DirectionsTravelMode[$('#travelMode').val()],
+		        unitSystem: google.maps.DirectionsUnitSystem[$('#unitSystem').val()],
+		        provideRouteAlternatives: true
+	    };
+		directionsService.route(request, function(response, status) {
+	        if (status == google.maps.DirectionsStatus.OK) {
+	            directionsDisplay.setMap(map);
+	            directionsDisplay.setPanel($("#directions_panel").get(0));
+	            directionsDisplay.setDirections(response);
+	        } else {
+	            alert("No Existe una ruta entre los puntos!!!!");
+	        }
+	    });
+	}
+	$('#search').live('click', function(){ getDirections(); });
+	$('.routeOptions').live('change', function(){ getDirections(); });
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+	</script>
+{% endblock %}
